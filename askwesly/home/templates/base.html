@@ -11,7 +11,7 @@ body, h1, h2, h3, p, ul, li {
     margin: 0;
     padding: 0;
 }
-/* Speech bubble style */
+/* Speech bubble style for bot*/
 .speech-bubble {
     position: relative;
     padding: 10px 15px;
@@ -21,17 +21,16 @@ body, h1, h2, h3, p, ul, li {
     display: inline-block;
 }
 
-/* Triangle or arrow on the speech bubble */
-.speech-bubble::after {
-    content: "";
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    border-width: 10px;
-    border-style: solid;
-    border-color: #4CAF50 transparent transparent transparent;
-    transform: translateX(-50%); /* Center the triangle */
+/* Speech bubble style for user*/
+.speech-bubble-u {
+    position: relative;
+    padding: 10px 15px;
+    background-color: #208fbf; /* Background color of the speech bubble */
+    color: #fff; /* Text color */
+    border-radius: 10px; /* Rounded corners to create the bubble shape */
+    display: inline-block;
 }
+
 /* Set a background color and font family for the entire page */
 body {
     background-color: #f4f4f4;

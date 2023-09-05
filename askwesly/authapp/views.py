@@ -4,6 +4,13 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 
+import os
+import openai
+
+API_KEY = os.environ.get('OPENAI_KEY')
+
+openai.api_key = API_KEY
+
 @login_required
 def secret_page(request):
     # Access the user's name
