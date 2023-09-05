@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Desk</title>
+    <!-- Add your CSS links and meta tags here -->
+    <style>
+/* Reset some default browser styles */
+body, h1, h2, h3, p, ul, li {
+    margin: 0;
+    padding: 0;
+}
+/* Speech bubble style */
+.speech-bubble {
+    position: relative;
+    padding: 10px 15px;
+    background-color: #4CAF50; /* Background color of the speech bubble */
+    color: #fff; /* Text color */
+    border-radius: 10px; /* Rounded corners to create the bubble shape */
+    display: inline-block;
+}
+
+/* Triangle or arrow on the speech bubble */
+.speech-bubble::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    border-width: 10px;
+    border-style: solid;
+    border-color: #4CAF50 transparent transparent transparent;
+    transform: translateX(-50%); /* Center the triangle */
+}
+/* Set a background color and font family for the entire page */
+body {
+    background-color: #f4f4f4;
+    font-family: Arial, sans-serif;
+}
+
+/* Navigation bar styles */
+nav {
+    background-color: #333;
+    color: #fff;
+}
+
+nav a {
+    color: #fff;
+    text-decoration: none;
+    padding: 15px 20px;
+}
+
+/* Add a hover effect to navigation links */
+nav a:hover {
+    background-color: #555;
+}
+
+/* Container for page content */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Footer styles */
+footer {
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 10px 0;
+}
+.large-text-box {
+    width: 100%; /* Adjust the width as needed */
+    height: 40px; /* Adjust the height as needed */
+    font-size: 16px; /* Adjust the font size as needed */
+    padding: 10px; /* Add padding for better appearance */
+}
+/* Add more CSS styles to customize your website further */
+
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav>
+        <div class="container">
+            <a href="{% url 'home' %}">Home</a>
+            <!-- Add more navigation links as needed -->
+        </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+        {% block content %}
+        <!-- Content of individual pages will be inserted here -->
+        {% endblock %}
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; {{ year }} Your Service Desk</p>
+        </div>
+    </footer>
+
+    <!-- Add your JavaScript includes here -->
+</body>
+</html>
