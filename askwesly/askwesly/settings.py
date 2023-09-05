@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'home',
+    'authapp',
 ]
 
 MIDDLEWARE = [
@@ -51,8 +52,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-LOGIN_REDIRECT_URL = 'home'  # Change this to the URL where users should be redirected after login.
-LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = '/authapp/secret/'
+LOGIN_URL = '/authapp/login/'
 
 ROOT_URLCONF = 'askwesly.urls'
 

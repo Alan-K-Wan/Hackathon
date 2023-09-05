@@ -1,19 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Add your CSS styles here */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 0;
+}
 
-{% extends "base.html" %}
-{% block content %}
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+}
+
+header h1 {
+    font-size: 36px;
+    margin-bottom: 10px;
+}
+
+header p {
+    font-size: 18px;
+    color: #777;
+}
+
+main {
+    margin: 20px 0;
+}
+
+footer {
+    margin-top: 20px;
+}
+
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007BFF; /* Blue button color */
+    color: #fff; /* White text color */
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.btn:hover {
+    background-color: #0056b3; /* Darker blue color on hover */
+}
+
+    </style>
+    <title>Home</title>
+</head>
+<body>
     <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <h1>Service Desk</h1>
-                <br>
-                <div class="speech-bubble">
-                    <p>Hello, my name is Wesly! How can I help you today?</p>
-                </div>
-                <br><br>
-                <div class="text-box">
-                    <input type="text" id="ask-text" placeholder="Ask me for something" class="large-text-box">
-                </div>
-            </div>
-        </div>
+        <header>
+            <h1>Welcome to Service Desk</h1>
+            <p>To start please login.</p>
+        </header>
+        <main>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eget efficitur purus. Vivamus ultrices enim eu felis ultrices, sit amet venenatis sapien malesuada.</p>
+            <p>Suspendisse potenti. Proin eget commodo tellus. Nunc interdum mauris nec odio tristique, ut blandit quam facilisis.</p>
+        </main>
+        <footer>
+            <a href="{% url 'authapp:login' %}" class="btn btn-primary">Login</a>
+
+        </footer>
     </div>
-{% endblock %}
+</body>
+</html>
