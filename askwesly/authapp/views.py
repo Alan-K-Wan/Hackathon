@@ -5,6 +5,28 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 import os
 import openai
+from django.contrib.auth.models import User
+from .models import UserProfile
+import json
+from django.http import JsonResponse
+
+prompt = '''
+    Can you respond with the following context/requirements to all further messages that you get
+    - you are to respond professionally and friendly like a service desk technician
+    - the response needs to be succinct (try to respond with 2 sentences or less)
+    - you need to get as much information regarding the request as possible
+    - if the request doesn't make any sense then politely reply asking for clarification
+    - Ask the user for relevant information in relation to the request but not questions that will not help them solve their problem
+    - Don't overbear the user with questions (Only  1 question at a time)
+    - Where possible try to link the user to relevant self help article
+    - If linking to a self help article then follow through by asking if it helped or not
+    - identify the impact by asking if its just them or do they know others who are also affected
+    - wrap any links in html anchor tags and make them open in a new tab
+    '''
+
+default = {
+            'msg': [{"role": "system", "content": prompt}]
+          }
 
 @login_required
 def secret_page(request):
@@ -18,30 +40,33 @@ def secret_page(request):
 @login_required
 def process_input(request):
 
-    prompt = '''
-    Can you respond with the following context/requirements to all further messages that you get
-    - you are to respond professionally, friendly like a service desk technician
-    - the response needs to be succinct (try to respond with 2 sentences or less)
-    - you need to get as much information regarding the request as possible
-    - if the request doesn't make any sense then politely reply asking for clarification
-    - Ask the user for relevant information in relation to the request but not questions that will not help them solve their problem
-    - Don't overbear the user with questions (Only  1 question at a time)
-    - Where possible try to link the user to relevant self help article
-    - If linking to a self help article, follow through by asking if it helped or not
-    - identify the impact by asking if its just them or do they know others who are also affected
-    - wrap any links in html anchor tags and make them open in a new tab
-    '''
-
     openai.api_key = os.environ.get('OPENAI_API_KEY')
 
     if request.method == 'POST':
         input_text = request.POST.get('input_text', '')
 
-        # Create a list of message dictionaries in the OpenAI format
-        messages = [
-            {"role": "system", "content": prompt},
-            {"role": "user", "content": input_text}
-        ]
+        # get list of message dictionaries in Open AI format from DB
+        user = User.objects.get(username=request.user.username)
+
+        # set text_field to default if it doesn't exist
+        if not hasattr(user, 'userprofile'):
+            user_profile = UserProfile.objects.create(user=user, text_field=json.dumps(default))
+
+        user_profile = UserProfile.objects.get(user=user)
+
+        # convert text_field to a list of dictionaries
+        data = json.loads(user_profile.text_field)
+
+        # get msg from data and store it in a variable called temp
+        listdict = data['msg']
+
+        messages = listdict
+
+        print(str(messages))
+        print()
+
+        # Append the user's input to the messages
+        messages.append({"role": "user", "content": input_text})
 
         chat = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
@@ -52,7 +77,12 @@ def process_input(request):
         reply = chat.choices[0].message.content
 
         # Append the assistant's reply to the messages
-        messages.append({"role": "assistant", "content": reply})
+        messages.append({"role": "system", "content": reply})
+
+        # Save the messages to the database
+        data['msg'] = messages
+        user_profile.text_field = json.dumps(data)
+        user_profile.save()
 
         # Process the input (you can replace this with your actual processing logic)
         processed_output = reply
