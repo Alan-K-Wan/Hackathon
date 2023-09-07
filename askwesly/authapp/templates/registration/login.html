@@ -77,9 +77,11 @@ form {
 }
 
     </style>
+    {% load static %}
 </head>
 <body>
     <div class="container">
+        <img src="{% static 'authapp/images/askwesley.png' %}" alt="askwesley">
         <h2>Login</h2>
         <form method="post">
             {% csrf_token %}

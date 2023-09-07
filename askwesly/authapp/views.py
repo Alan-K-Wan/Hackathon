@@ -13,6 +13,8 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
+GMAIL_PASSWORD = 'nnfjtvhcampxisou'
+
 prompt = '''
     Can you respond with the following context/requirements to all further messages that you get
     - you are to respond professionally and friendly like a service desk technician
@@ -41,7 +43,7 @@ prompt = '''
     - If the user is concerned about submitting a ticket then assure them that it is the best way to get their issue resolved and ask them again if they want to submit a ticket. 
     - If the user wants to reset a password always ask which account they want to reset before providing a link to a guide to reset it themselves if there is one
     - If the user is requesting a service from IT then ask them to provide information about the service and submit a ticket on their behalf
-    - it is imperetive that you ask the users that you ask the user if they are okay with you (the ai) submiting a ticket on their behalf after asking them the relevant questions
+    - it is imperetive that you ask the user if they are okay with a ticket being submitted.
     '''
 
 default = {
@@ -148,8 +150,68 @@ def process_input(request):
         if trueFalse == "TRUE":
             print("EMAIL SENT")
 
-            
+            # get a suitable subject line for the email
+            subject_prompt = [{"role": "system", "content": "Using a conversation between a client and service deks technician, respond with a subject for an email to IT support to all further messages that you get. The converation will be a list of dictionaries"}]
 
+            subject_prompt.append({"role": "user", "content": str(messages)}) 
+
+            get_subject = openai.ChatCompletion.create(
+                model="gpt-4",
+                messages=subject_prompt,    
+                max_tokens=150
+            )
+
+            subject_t = get_subject.choices[0].message.content
+
+            # get a suitable body for the email
+            body_prompt = [{"role": "system", "content": "Using a conversation between a client and service deks technician, respond with a suitable email body. Try to include the impact, what service is affected, how it is impacting business operations, and when the problem started. The converation will be a list of dictionaries"}]
+
+            body_prompt.append({"role": "user", "content": str(messages)})
+
+            get_body = openai.ChatCompletion.create(
+                model="gpt-4",
+                messages=body_prompt,
+                max_tokens=150
+            )
+
+            body_t = get_body.choices[0].message.content
+
+            # send the email
+
+            # Email configuration
+            sender_email = 'askwesley589@gmail.com'
+            sender_password = GMAIL_PASSWORD
+            recipient_email = '23072152@student.uwa.edu.au'
+            subject = subject_t
+            message = body_t
+
+            # Create a MIMEText object for the email content
+            msg = MIMEMultipart()
+            msg['From'] = sender_email
+            msg['To'] = recipient_email
+            msg['Subject'] = subject
+            msg.attach(MIMEText(message, 'plain'))
+
+            # SMTP server configuration (for Gmail)
+            smtp_server = 'smtp.gmail.com'
+            smtp_port = 587
+
+            # Establish a connection to the SMTP server
+            try:
+                server = smtplib.SMTP(smtp_server, smtp_port)
+                server.starttls()
+                server.login(sender_email, sender_password)
+
+                # Send the email
+                server.sendmail(sender_email, recipient_email, msg.as_string())
+                print('Email sent successfully')
+
+            except Exception as e:
+                print(f'An error occurred: {str(e)}')
+
+            finally:
+                # Close the SMTP server connection
+                server.quit()
 
         # Return the processed result as JSON
         return JsonResponse({'result': processed_output})
