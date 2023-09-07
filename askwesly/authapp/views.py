@@ -9,6 +9,9 @@ from django.contrib.auth.models import User
 from .models import UserProfile
 import json
 from django.http import JsonResponse
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 prompt = '''
     Can you respond with the following context/requirements to all further messages that you get
@@ -19,23 +22,65 @@ prompt = '''
     - Ask the user for relevant information in relation to the request but not questions that will not help them solve their problem
     - Don't overbear the user with questions (Only  1 question at a time)
     - Where possible try to link the user to relevant self help article
+    - If there is a clear article to link to then don't bother asking extra questions
     - If linking to a self help article then follow through by asking if it helped or not
     - identify the impact by asking if its just them or do they know others who are also affected
-    - wrap any links in html anchor tags and make them open in a new tab
+    - Always wrap any website links in html anchor tags and make them open in a new tab
+    - Do not ever respond with "I don't know" or "I can't help you"
+    - If it is a request that cannot be fulfilled by linking to a self helf article (for example borrowing a laptop) then gather enough information to craft an email that can be sent to the relevant team
+    - If the request cannot be completed by simply linking to an article then clearly state that you (the assistant) will subnit a ticket on the clients behalf
+    - Remember that it is preferred that a ticket is submitted rather than the client getting annoyed and clicking off the page
+    - There is no need to ask for contact information as this is already provided by the user's profile
+    - Once you have gathered enough information to submit a ticket then clearly state that you will submit a ticket on the clients behalf
+    - Always submit a ticket if the user is reprting something serious like a cyber incident, safety hazard, large scale outage, etc.
+    - Do not say anything that you don't know is completely true. If you don't know then say something like "the it Team will investigate and get back to you"
+    - Remember to always say you will submit a ticket on the clients behalf if they are reporting something that requires IT attention
+    - Always ask the user if they are okay with you (the ai assistant) submitting a ticket on their behalf. If they say yes then confirm that you have. If they say no then confirm that you will not. This is very important
+    - If the user would like to inform IT of something for example a cyber incident (no matter the severity) then gather the required information and submit a ticket on the clients behalf
+    - If the a user is reporting something that doesn't require IT attention then ALWAYS ask if they would like to submit a ticket anyway
+    - If the user is concerned about submitting a ticket then assure them that it is the best way to get their issue resolved and ask them again if they want to submit a ticket. 
+    - If the user wants to reset a password always ask which account they want to reset before providing a link to a guide to reset it themselves if there is one
+    - If the user is requesting a service from IT then ask them to provide information about the service and submit a ticket on their behalf
+    - it is imperetive that you ask the users that you ask the user if they are okay with you (the ai) submiting a ticket on their behalf after asking them the relevant questions
     '''
 
 default = {
             'msg': [{"role": "system", "content": prompt}]
           }
 
+ticket_submitted = '''
+    Respond "TRUE" to my next message only if the following conditions are met
+    - the message is confirming that a ticket has been submitted or an email has been sent to the service desk.
+    - it doesn't count if the message is asking for confirmation to submit a ticket
+    - There are no pending information that is still required
+    - The message doesn't ask something like "are you okay with this"
+    Otherwise respond "FALSE". ONLY respond with one word "TRUE" or "FALSE" to the next message
+    '''
+
+approval = [{
+    'msg': {"role": "system", "content": ticket_submitted}
+}]
+
 @login_required
 def secret_page(request):
     # Access the user's name
     user_name = request.user.username
 
+    # get list of message dictionaries in Open AI format from DB
+    user = User.objects.get(username=user_name)
+
+    # set text_field to default every time the user gets taken to secret page
+    if not hasattr(user, 'userprofile'):
+        user_profile = UserProfile.objects.create(user=user, text_field=json.dumps(default))
+    else:
+        user_profile = UserProfile.objects.get(user=user)
+        user_profile.text_field = json.dumps(default)
+        user_profile.save()
+
     # Pass the user's name to the template
     context = {'user_name': user_name}
     return render(request, 'authapp/secret_page.html', context)
+    
 
 @login_required
 def process_input(request):
@@ -62,16 +107,13 @@ def process_input(request):
 
         messages = listdict
 
-        print(str(messages))
-        print()
-
         # Append the user's input to the messages
         messages.append({"role": "user", "content": input_text})
 
         chat = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4",
             messages=messages,
-            max_tokens=75
+            max_tokens=150
         )
 
         reply = chat.choices[0].message.content
@@ -86,6 +128,28 @@ def process_input(request):
 
         # Process the input (you can replace this with your actual processing logic)
         processed_output = reply
+
+        # Send an email if the user confirms that they want the ticket submitted
+
+        approval = [
+            {"role": "system", "content": ticket_submitted}
+        ]
+
+        approval.append({"role": "user", "content": processed_output})
+
+        check_approved = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=approval,
+            max_tokens=150
+        )
+
+        trueFalse = check_approved.choices[0].message.content
+
+        if trueFalse == "TRUE":
+            print("EMAIL SENT")
+
+            
+
 
         # Return the processed result as JSON
         return JsonResponse({'result': processed_output})

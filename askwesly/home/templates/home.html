@@ -52,18 +52,27 @@ footer {
     background-color: #0056b3; /* Darker blue color on hover */
 }
 
+/* In your existing CSS styles or an external CSS file */
+.small-image {
+    width: 50%;
+    height: auto; /* Maintain aspect ratio */
+}
+
+
     </style>
     <title>Home</title>
+    {% load static %}
 </head>
 <body>
     <div class="container">
         <header>
+            <img src="{% static 'home/images/askwesley.png' %}" alt="askwesley" class="small-image">
             <h1>Welcome to Service Desk</h1>
             <p>To start please login.</p>
         </header>
         <main>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eget efficitur purus. Vivamus ultrices enim eu felis ultrices, sit amet venenatis sapien malesuada.</p>
-            <p>Suspendisse potenti. Proin eget commodo tellus. Nunc interdum mauris nec odio tristique, ut blandit quam facilisis.</p>
+            <p>PRIVACY NOTICE: Ask WESley does not store any conversations once your help session is over. However, Azure Open AI may collect data to improve its services.</p>
+            <p>DISCLAIMER: This software comes with absolutely no warranty. The Authors of Ask WESley are not responsible for any damages that occur when you use it.</p>
         </main>
         <footer>
             <a href="{% url 'authapp:login' %}" class="btn btn-primary">Login</a>
