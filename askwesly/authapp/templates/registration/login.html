@@ -76,12 +76,18 @@ form {
     }
 }
 
+/* In your existing CSS styles or an external CSS file */
+.small-image {
+    width: 50%;
+    height: auto; /* Maintain aspect ratio */
+}
+
     </style>
     {% load static %}
 </head>
 <body>
     <div class="container">
-        <img src="{% static 'authapp/images/askwesley.png' %}" alt="askwesley">
+        <img src="{% static 'authapp/images/askwesley.png' %}" alt="askwesley" class="small-image">
         <h2>Login</h2>
         <form method="post">
             {% csrf_token %}

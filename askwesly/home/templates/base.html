@@ -15,17 +15,18 @@ body, h1, h2, h3, p, ul, li {
 .speech-bubble {
     position: relative;
     padding: 10px 15px;
-    background-color: #4CAF50; /* Background color of the speech bubble */
+    background: linear-gradient(to bottom, #45A049, #4CAF50);
     color: #fff; /* Text color */
     border-radius: 10px; /* Rounded corners to create the bubble shape */
     display: inline-block;
 }
 
+
 /* Speech bubble style for user*/
 .speech-bubble-u {
     position: relative;
     padding: 10px 15px;
-    background-color: #208fbf; /* Background color of the speech bubble */
+    background: linear-gradient(to bottom, #1671b5, #208fbf);
     color: #fff; /* Text color */
     border-radius: 10px; /* Rounded corners to create the bubble shape */
     display: inline-block;
@@ -76,6 +77,45 @@ footer {
 }
 /* Add more CSS styles to customize your website further */
 
+/* Define a CSS class for the styled button with a gradient background */
+.custom-button {
+    background: linear-gradient(45deg, #007bff, #0056b3); /* Gradient background */
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px; /* Rounded corners */
+    transition: background 0.8s ease; /* Smooth transition for the background color */
+}
+
+/* Style the button on hover */
+.custom-button:hover {
+    background: linear-gradient(45deg, #0056b3, #007bff); /* Gradient background on hover */
+}
+
+.thinking {
+  font-size: 24px; /* Increase the font size */
+  animation: colorCycle 5s linear infinite;
+}
+
+@keyframes colorCycle {
+  0% {
+    color: #005cbf; /* Darker Blue */
+  }
+  25% {
+    color: #00741e; /* Darker Green */
+  }
+  50% {
+    color: #d84315; /* Darker Orange */
+  }
+  75% {
+    color: #7b1fa2; /* Darker Purple */
+  }
+  100% {
+    color: #005cbf; /* Back to Darker Blue */
+  }
+}
+
     </style>
 </head>
 <body>
@@ -84,6 +124,9 @@ footer {
         <div class="container">
             <a href="{% url 'home' %}">Home</a>
             <!-- Add more navigation links as needed -->
+            {% if user.is_authenticated %}
+            <a href="{% url 'authapp:login' %}" class="btn btn-primary" style="color:crimson">Logout</a>
+            {% endif %}
         </div>
     </nav>
 

@@ -164,7 +164,7 @@ def process_input(request):
             subject_t = get_subject.choices[0].message.content
 
             # get a suitable body for the email
-            body_prompt = [{"role": "system", "content": "Using a conversation between a client and service deks technician, respond with a suitable email body. Try to include the impact, what service is affected, how it is impacting business operations, and when the problem started. The converation will be a list of dictionaries"}]
+            body_prompt = [{"role": "system", "content": "Using a conversation between a client and service deks technician, respond with a suitable email body. Try to include the impact, what service is affected, how it is impacting business operations, and when the problem started. The clients name is {name}. Sign off the email with the name 'WESley'. The converation will be a list of dictionaries".format(request.user.username)}]
 
             body_prompt.append({"role": "user", "content": str(messages)})
 
